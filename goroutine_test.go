@@ -23,6 +23,11 @@ func TestCreateGoroutine(t *testing.T) {
 	time.Sleep(1 * time.Second)
 }
 
+
+// Create 100_000 goroutines without any memory leaks
+// Goroutines is around 2kb, different with traditional thread around 1mb
+// Thats why goroutines called small-threads
+// Actually goroutines is NOT thread, instead its a proccess that running INSIDE a thread
 func DisplayNumber(n int) {
 	fmt.Println("Goroutine:", n)
 }

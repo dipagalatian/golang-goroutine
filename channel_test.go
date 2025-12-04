@@ -1,0 +1,46 @@
+package golang_goroutine
+
+import (
+	"fmt"
+	"testing"
+	"time"
+)
+
+// Channel is use for sending and receiving data from 1 goroutines to another different goroutine
+// create new channel can used make() method
+
+// IMPORTANT! make sure to CLOSE the channel after using it to avoid memory leaks and make the go garbage collectors remove it from memory
+// Sending data to CHANNEL: channelName <- data
+// Receive data from CHANNEL: data <- channelName
+// Use data from channel to params: fmt.Println(<- channel)
+
+// CAREFULL!
+// sending goroutine data to channel without goroutines receive can caused hang or block the proccess until there is 1 goroutine to receive
+// receive goroutine data from channel without goroutine sender can cause deadlock! because all goroutine is sleep
+
+func TestCreateChannel(t *testing.T) {
+	// create channel
+	channel := make(chan string)
+	// approach 1: close channel using defer to make sure channel closed at the end of func
+	defer close(channel) 
+
+	go func(){
+		time.Sleep(2 * time.Second)
+
+		channel <- "Dipa Galatian"
+		fmt.Println("Done sending data to channel")
+	}()
+
+	// why the receiver is not goroutines? NO, basically all proccess in go is treats as MAIN goroutines
+	// so sending from goroutine anonymous func to data with channel is correct way
+	data := <- channel
+	fmt.Println("Received data from channel:", data)
+
+	time.Sleep(5 * time.Second)
+
+
+	// close channel at the end (approach 2)
+	// close(channel)
+
+
+}
