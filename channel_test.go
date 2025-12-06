@@ -29,7 +29,12 @@ func TestCreateChannel(t *testing.T) {
 
 		channel <- "Dipa Galatian"
 		fmt.Println("Done sending data to channel")
+
+		channel <- "as;ldkfja;sldk"
 	}()
+
+	data2 := <- channel
+	fmt.Println("Received data2 from channel:", data2)
 
 	// why the receiver is not goroutines? NO, basically all proccess in go is treats as MAIN goroutines
 	// so sending from goroutine anonymous func to data with channel is correct way
@@ -41,6 +46,24 @@ func TestCreateChannel(t *testing.T) {
 
 	// close channel at the end (approach 2)
 	// close(channel)
+}
 
+// Channel as parameter
+func GiveMeResponse(channel chan string) {
+	time.Sleep(2 * time.Second)
+	channel <- "Secret data user"
+}
 
+func TestChannelAsParams(t *testing.T) {
+
+	channel := make(chan string)
+	defer close(channel)
+
+	go GiveMeResponse(channel)
+
+	data := <- channel
+	fmt.Println("Received secret from channel:", data)
+
+	time.Sleep(5 * time.Second)
+	
 }
