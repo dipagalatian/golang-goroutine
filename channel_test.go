@@ -196,7 +196,41 @@ func TestSelectChannel(t *testing.T) {
 			break
 		} 
 	}
-	
+}
 
-	
+// Default select channel	
+// implement logic while waiting data from channels
+func TestDefaultSelectChannel(t *testing.T) {
+	ch1 := make(chan string)
+	ch2 := make(chan string)
+
+	defer close(ch1)
+	defer close(ch2)
+
+	go GiveMeResponse(ch1)
+	go GiveMeResponse(ch2)
+
+	counter := 0
+	for {
+		select {
+		case data := <- ch1:
+			fmt.Println("Received from ch1:", data)
+			counter++
+
+		case data := <- ch2:
+			fmt.Println("Received from ch2:", data)
+			counter++
+
+		// Do any logic while waiting for incoming data from channels
+		// since our goroutines funcs implement sleep for 2 seconds each, this logic will print info
+		default:
+			fmt.Println("Waiting for data...")
+		}
+
+		// break the loop
+		if counter == 2 {
+			fmt.Printf("Channel finish. Received %d data from channel\n", counter)
+			break
+		} 
+	}
 }
