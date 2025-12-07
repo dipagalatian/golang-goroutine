@@ -2,6 +2,7 @@ package golang_goroutine
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -124,4 +125,28 @@ func TestBufferedChannel(t *testing.T) {
 	// fmt.Println(<- channel)
 	// fmt.Println(<- channel)
 	
+}
+
+// Range Channel
+// channel can be used as iterator
+// use this approach to send multiple data to channel by iteration
+// receive multiple value from channel using for range loop
+// IMPORTANT! close the channel after iteration done, this to avoid memory leaks and infinite loop when receiving data
+func TestRangeChannel(t *testing.T) {
+	ch := make(chan string)
+
+	// Send multiple data to channel
+	go func(){
+		for i := 0; i < 10; i++ {
+			ch <- "data index " + strconv.Itoa(i)
+		}
+		close(ch)
+	}()
+
+	// Receive data from channel
+	for n := range ch {
+		fmt.Println("Received from channel:", n)
+	}
+
+	fmt.Println("Channel done")
 }
