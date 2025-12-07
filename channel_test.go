@@ -65,5 +65,63 @@ func TestChannelAsParams(t *testing.T) {
 	fmt.Println("Received secret from channel:", data)
 
 	time.Sleep(5 * time.Second)
+}
+
+// Channel IN
+func OnlyIn(channel chan<- string) {
+	time.Sleep(2 * time.Second)
+	channel <- "super super secret data"
+}
+
+// Channel Out
+func OnlyOut(channel <-chan string)  {
+	data := <- channel
+	fmt.Println("Received super secret from channel:", data)
+}
+
+func TestInOutChannel(t *testing.T) {
+	channel := make(chan string)
+	defer close(channel)
+
+	// send data to channel (using func params)
+	go OnlyIn(channel)
+
+	// receive data from channel (using func params)
+	go OnlyOut(channel)
+
+	time.Sleep(5 * time.Second)
+}
+
+// Buffered Channel
+// by default, channel is unbuffered, means data must sent and received at the same time
+// buffered channel means data can be sent to channel without waiting for receiver to receive it
+func TestBufferedChannel(t *testing.T) {
+	channel := make(chan string, 3)
+	defer close(channel)
+
+	go func(){
+		channel <- "dipa"
+		channel <- "galatian"
+		channel <- "super secret data"
+	}()
+
+	go func(){
+		time.Sleep(2 * time.Second)
+
+		fmt.Println(<- channel)
+		fmt.Println(<- channel)
+		fmt.Println(<- channel)
+	}()
+
+	// Send to channel without goroutine
+	// channel <- "dipa"
+	// channel <- "galatian"
+
+	time.Sleep(2 * time.Second)
+	fmt.Println("Channel done")
+
+	// Receive from channel without goroutine
+	// fmt.Println(<- channel)
+	// fmt.Println(<- channel)
 	
 }
