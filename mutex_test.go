@@ -35,3 +35,46 @@ func TestMutex(t * testing.T) {
 	fmt.Printf("Total counter: %d\n", totalCounter)
 	
 }
+
+// RW Mutex (Read Write Mutex)
+// we can separate locking for operation read and write
+// lock & unlock -> write conditioin
+// RLock & RUnlock -> read condition
+// example: we have bank account struct, we want to add balance and get balance
+
+type BankAccount struct {
+	RWMutex sync.RWMutex
+	Balance int
+}
+
+func (bk *BankAccount) AddBalance(ammount int) {
+	bk.RWMutex.Lock()
+	bk.Balance = bk.Balance + ammount
+	bk.RWMutex.Unlock()
+}
+func (bk *BankAccount) GetBalance() int {
+	bk.RWMutex.RLock()
+	balance := bk.Balance
+	bk.RWMutex.RUnlock()
+
+	return balance
+}
+
+func TestRWMutex(t *testing.T) {
+	account := BankAccount{}
+
+	for i := 0; i < 100; i++ {
+		go func ()  {
+
+			for j := 0; j < 100; j++ {
+				account.AddBalance(1)
+				fmt.Println("Balance now:", account.GetBalance())
+			}
+			
+		}()
+	}
+
+	time.Sleep(5 * time.Second)
+	fmt.Println("Total balance:", account.GetBalance())
+	
+}
