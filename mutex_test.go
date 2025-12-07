@@ -47,15 +47,15 @@ type BankAccount struct {
 	Balance int
 }
 
-func (bk *BankAccount) AddBalance(ammount int) {
-	bk.RWMutex.Lock()
-	bk.Balance = bk.Balance + ammount
-	bk.RWMutex.Unlock()
+func (ba *BankAccount) AddBalance(ammount int) {
+	ba.RWMutex.Lock()
+	ba.Balance = ba.Balance + ammount
+	ba.RWMutex.Unlock()
 }
-func (bk *BankAccount) GetBalance() int {
-	bk.RWMutex.RLock()
-	balance := bk.Balance
-	bk.RWMutex.RUnlock()
+func (ba *BankAccount) GetBalance() int {
+	ba.RWMutex.RLock()
+	balance := ba.Balance
+	ba.RWMutex.RUnlock()
 
 	return balance
 }
