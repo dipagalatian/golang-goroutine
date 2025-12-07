@@ -150,3 +150,53 @@ func TestRangeChannel(t *testing.T) {
 
 	fmt.Println("Channel done")
 }
+
+// Select Channel
+// use select channel to receive data from multiple channel
+// select channel can be used as switch case
+func TestSelectChannel(t *testing.T) {
+	ch1 := make(chan string)
+	ch2 := make(chan string)
+
+	defer close(ch1)
+	defer close(ch2)
+
+	go GiveMeResponse(ch1)
+	go GiveMeResponse(ch2)
+
+	// Only 1 fastest data can be receive
+	// use loop to receive data from multiple channel
+	// select {
+	// case data := <- ch1:
+	// 	fmt.Println("Received from ch1:", data)
+
+	// case data := <- ch2:
+	// 	fmt.Println("Received from ch2:", data)
+	// }
+
+	// prefer do with this loop instead of 1 select above
+	// use for loop (with break condition)
+	// manual counter to break the infinite for loop
+	// we assume max counter to be 2, because we run 2 goroutine func that will return 1 data each channel
+	counter := 0
+	for {
+		select {
+		case data := <- ch1:
+			fmt.Println("Received from ch1:", data)
+			counter++
+
+		case data := <- ch2:
+			fmt.Println("Received from ch2:", data)
+			counter++
+		}
+
+		// break the loop
+		if counter == 2 {
+			fmt.Printf("Channel finish. Received %d data from channel\n", counter)
+			break
+		} 
+	}
+	
+
+	
+}
