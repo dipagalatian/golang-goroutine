@@ -78,3 +78,78 @@ func TestRWMutex(t *testing.T) {
 	fmt.Println("Total balance:", account.GetBalance())
 	
 }
+
+// Deadlock
+// deadlock is happen when goroutines are waiting for another goroutines to finish, but the other goroutines is waiting for this goroutines to finish
+// example: goroutine A is waiting for goroutine B to finish, but goroutine B is waiting for goroutine A to finish
+// to solve this problem, we can use channel to communicate between goroutines
+
+type UserBalance struct {
+	sync.Mutex
+	Name string
+	Balance int
+}
+
+func (ub *UserBalance) Lock() {
+	ub.Mutex.Lock()
+}
+
+func (ub *UserBalance) Unlock() {
+	ub.Mutex.Unlock()
+}
+
+func (ub *UserBalance) Change(amount int) {
+	ub.Balance = ub.Balance + amount
+}
+
+func Transfer(userFrom *UserBalance, userTo *UserBalance, amount int) {
+
+	userFrom.Lock()
+	fmt.Println("Lock userFrom:", userFrom.Name)
+	userFrom.Change(-amount)
+	// userFrom.Unlock()
+
+	time.Sleep(1 * time.Second)
+
+	userTo.Lock()
+	fmt.Println("Lock userTo:", userTo.Name)
+	userTo.Change(amount)
+	// userTo.Unlock()
+
+	time.Sleep(1 * time.Second)
+
+	userFrom.Unlock()
+	userTo.Unlock()
+}
+
+func TestDeadlock(t *testing.T) {
+
+	user1 := UserBalance {
+		Name: "Dipa",
+		Balance: 1_000_000,
+	}
+	user2 := UserBalance {
+		Name: "Galatian",
+		Balance: 1_000_000,
+	}
+
+	go Transfer(&user1, &user2, 100_000) // goroutine 1
+	go Transfer(&user2, &user1, 200_000) // goroutine 2
+
+	time.Sleep(3 * time.Second)
+
+	fmt.Println("User name:", user1.Name, "Balance:", user1.Balance)
+	fmt.Println("User name:", user2.Name, "Balance:", user2.Balance)	
+
+	// These logs will show balance for user1 is 900_000 and user2 is 800_000
+	// question is, why the total money gone 300_000 in these 2 transaction?
+	// its because deadlock -> goroutine 1 wait for goroutine 2 and vice versa
+	// you can see the Lock logs only show for the "userFrom" in both user
+	// so the deadlock flow are:
+	// goroutine 1 is locking the userFrom (galatian)
+	// goroutine 2 is locking the userFrom (dipa)
+	// when goroutine 1 is going to lock the userTo (galatian), its already been locked by goroutine 2
+	// and at the same time, when goroutine 2 is going to lock the userTo(dipa), its already been locked by goroutine 1
+	// both goroutine is waiting each other and make DEADLOCK happen.
+	
+}
