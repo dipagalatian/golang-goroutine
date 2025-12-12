@@ -14,8 +14,10 @@ import (
 // so by implementing this WaitGroup, it will wait until all goroutine proccess done before end the func proccess
 
 func RunAsynchronous(group *sync.WaitGroup) {
+	// This tell the group to decrement by 1
 	defer group.Done()
 
+	// This tell the group to increment by 1
 	group.Add(1)
 
 	// add some proccess here
@@ -31,6 +33,7 @@ func TestWaitGroup(t *testing.T) {
 		go RunAsynchronous(group)
 	}
 
+	// This will block or wait the all goroutines to finish before finish the func process
 	group.Wait()
 	fmt.Println("All goroutines complete!")
 	
