@@ -118,7 +118,7 @@ func TestBufferedChannel(t *testing.T) {
 	// channel <- "dipa"
 	// channel <- "galatian"
 
-	time.Sleep(2 * time.Second)
+	time.Sleep(5 * time.Second)
 	fmt.Println("Channel done")
 
 	// Receive from channel without goroutine

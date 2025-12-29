@@ -19,9 +19,9 @@ func TestOnce(t *testing.T) {
 
 	// 100 goroutine will try to call the OnlyOnce func
 	for i := 0; i < 100; i++ {
+		group.Add(1)
 		go func ()  {
 			defer group.Done()
-			group.Add(1)
 			once.Do(OnlyOnce)
 			
 		}()
