@@ -38,3 +38,39 @@ func TestWaitGroup(t *testing.T) {
 	fmt.Println("All goroutines complete!")
 	
 }
+
+type BookingSystem struct {
+	sync.Mutex
+	AvailableSlots int
+}
+
+func (bs *BookingSystem) BookSlot() {
+	bs.Lock()
+	defer bs.Unlock()
+
+	if bs.AvailableSlots > 0 {
+		bs.AvailableSlots--
+		fmt.Println("Slot booked successfully! Remaining slots:", bs.AvailableSlots)
+	} else {
+		fmt.Println("No available slots")
+		return
+	}
+}
+
+func TestBookingSystem(t *testing.T) {
+	bookingSystem := &BookingSystem{AvailableSlots: 10}
+
+	var wg sync.WaitGroup
+
+	// Simulate multiple users trying to book slots concurrently
+	for i := 0; i < 15; i++ {
+		wg.Add(1)
+		go func ()  {
+			defer wg.Done()
+			bookingSystem.BookSlot()
+		}()
+	}
+
+	wg.Wait()
+	fmt.Println("Booking process complete! Final available slots:", bookingSystem.AvailableSlots)
+}
