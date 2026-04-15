@@ -14,7 +14,7 @@ func TestPool(t *testing.T) {
 			return "New"
 		},
 	}
-	wg := &sync.WaitGroup{}
+	var wg sync.WaitGroup
 
 	connectionPool.Put("dipa")
 	connectionPool.Put("galatian")
@@ -28,7 +28,7 @@ func TestPool(t *testing.T) {
 
 			data := connectionPool.Get()
 			fmt.Println("data connectionPool:", data, "index:", i)
-			time.Sleep(2 * time.Second)
+			time.Sleep(1 * time.Second)
 			connectionPool.Put(data)
 			
 		}(i)
