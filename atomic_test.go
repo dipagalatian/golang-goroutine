@@ -30,3 +30,22 @@ func TestAtomic(t *testing.T) {
 	
 	
 }
+
+func TestGlobalVisitorCounter(t *testing.T) {
+
+	var visitorCounter atomic.Uint64
+	var wg sync.WaitGroup
+
+	// Simulate 1000 visitors accessing the website concurrently
+	for i := 0; i < 1000; i++ {
+		wg.Add(1)
+		go func ()  {
+			defer wg.Done()
+			visitorCounter.Add(1)
+		}()
+	}
+
+	wg.Wait()
+	fmt.Println("Total visitors:", visitorCounter.Load())
+	
+}
