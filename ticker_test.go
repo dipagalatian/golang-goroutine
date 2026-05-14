@@ -9,19 +9,36 @@ import (
 // NewTicker
 // return object of ticker
 // we should get the channel and data manually
-func TestTicker(t *testing.T) {
 
+func TestTickerStop(t *testing.T) {
+
+	// Create a ticker that ticks every 2 seconds
 	ticker := time.NewTicker(2 * time.Second)
+	defer ticker.Stop()
 
+	// Create a channel to signal the worker to stop
+	done := make(chan bool)
+
+	// Start the background worker to listen for ticker events
 	go func ()  {
-		time.Sleep(10 * time.Second)
-		ticker.Stop()
+		for {
+			select {
+			case <- done:
+				fmt.Println("Worker received stop signal")
+				return
+			case data := <- ticker.C:
+				fmt.Println("Worker received at:", data.Format("15:04:05"))
+			}
+		}
 	}()
 
-	for data := range ticker.C {
-		fmt.Println("Now:", data)
 
-	}
+	// Let the func wait for 10 seconds before sending the stop signal
+	time.Sleep(10 * time.Second)
+
+	// Send the stop signal to the worker
+	done <- true
+	fmt.Println("Ticker stop")
 }
 
 // Tick
